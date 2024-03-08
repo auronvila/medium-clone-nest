@@ -2,7 +2,7 @@ import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateArticleDto } from '@app/article/dto/createArticle.dto';
 import { ArticleEntity } from '@app/article/article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { UserEntity } from '@app/user/user.entity';
 import { ArticleResponseInterface } from '@app/types/articleResponse.interface';
 import slugify from 'slugify';
@@ -39,5 +39,34 @@ export class ArticleService {
       throw new HttpException('no article was found', HttpStatus.NOT_FOUND);
     }
     return this.buildArticleResponse(article);
+  }
+
+  async deleteArticleBySlug(slug: string, currentUserId: string): Promise<DeleteResult> {
+    const article = await this.getArticleBySlug(slug);
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+    if (article.article.author.id !== currentUserId) {
+      throw new HttpException('only the creator of the article can delete it', HttpStatus.FORBIDDEN);
+    }
+
+    return await this.articleRepository.delete({ slug });
+  }
+
+  async updateArticle(currentUserId: string, currentArticleSlug: string, updateArticleReqDto: CreateArticleDto): Promise<ArticleResponseInterface> {
+    const article = await this.getArticleBySlug(currentArticleSlug);
+
+    if (!article) {
+      throw new HttpException('No article was found', HttpStatus.NOT_FOUND);
+    }
+
+    if (article.article.author.id !== currentUserId) {
+      throw new HttpException('only the creator of the article can update it', HttpStatus.FORBIDDEN);
+    }
+
+    Object.assign(article.article, updateArticleReqDto);
+    article.article.slug = this.getSlug(updateArticleReqDto.title);
+    await this.articleRepository.save(article.article);
+    return this.buildArticleResponse(article.article);
   }
 }
