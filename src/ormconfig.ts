@@ -1,5 +1,4 @@
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-import { TagEntity } from '@app/tag/tag.entity';
 
 
 const config: PostgresConnectionOptions = {
