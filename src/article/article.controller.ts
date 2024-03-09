@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Put, Query,
   Req,
   UseGuards,
   UsePipes,
@@ -18,10 +18,16 @@ import { CreateArticleDto } from '@app/article/dto/createArticle.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { ArticleResponseInterface } from '@app/types/articleResponse.interface';
 import { DeleteResult } from 'typeorm';
+import { ArticlesResponseInterface } from '@app/types/articlesResponse.interface';
 
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {
+  }
+
+  @Get()
+  async findAll(@User('id') currentUserId: string, @Query() query: any): Promise<ArticlesResponseInterface> {
+    return await this.articleService.findAll(currentUserId,query)
   }
 
   @Post()
