@@ -1,0 +1,596 @@
+{
+	"info": {
+		"_postman_id": "0684fb01-ce2c-4283-9133-14bad798d833",
+		"name": "medium-clone",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26759646"
+	},
+	"item": [
+		{
+			"name": "tags",
+			"item": [
+				{
+					"name": "find-all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/tags",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"tags"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(201);",
+									"",
+									"  var json = pm.response.json();",
+									"  pm.globals.set(\"access_token\", json.user.access_token);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": {\n        \"username\":\"auron2\",\n        \"email\":\"auron2@gmail.com\",\n        \"password\":\"aaa\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/users",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(201);",
+									"",
+									"  var json = pm.response.json();",
+									"  pm.globals.set(\"access_token\", json.user.access_token);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": {\n        \"email\" :\"auronvila.dev@gmail.com\",\n        \"password\": \"aaa\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/users/login",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "currentUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIwOGJmZWM1LTllZjEtNDI3YS1iNjI4LWEzMmU0OTg1YWZkMiIsInVzZXJuYW1lIjoiYXVyb252aWxhIiwiZW1haWwiOiJhdXJvbkBnbWFpbC5jb20iLCJpYXQiOjE3MDk1NzcxMDF9.aI5QZPyZpcLA83r04xWDHtiJTqeG5myFQGSW1WKveN0",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{local}}/user",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": {\n        \"bio\":\"ffff\",\n        \"image\":\"ffff\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/user",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "article",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"article\": {\n        \"title\": \"auron 2 article\",\n        \"description\":\"auron 2 article\",\n        \"body\": \"body\",\n        \"tagList\": [\"a\",\"v\"]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/articles",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getBySlug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/articles/:slug",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "slugishh-n2vln7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteBySlug",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/articles/:slug",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "delete-test-rrnihe"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"article\": {\n        \"title\": \"new titlee\",\n        \"description\":\"updated title\",\n        \"body\": \"updated body\",\n        \"tagList\": [\"reactjs\",\"typescript\", \"newww\"]\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{local}}/articles/:slug",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "new-titlee-13rack"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ArticlesList",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/articles",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "tag",
+									"value": "typescript",
+									"disabled": true
+								},
+								{
+									"key": "author",
+									"value": "auronvila",
+									"disabled": true
+								},
+								{
+									"key": "favourited",
+									"value": "auronvila",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddArticleToFavourites",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/articles/:slug/favourite",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles",
+								":slug",
+								"favourite"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "delete-test4-3dhd39"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteArticleFromFavourites",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/articles/:slug/favourite",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"articles",
+								":slug",
+								"favourite"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "delete-test4-ao54dg"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "profiles",
+			"item": [
+				{
+					"name": "getProfile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/profiles/:username",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"profiles",
+								":username"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "auronvila"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "followProfile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/profiles/:username/follow",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"profiles",
+								":username",
+								"follow"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "auronvila"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unfollowProfile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{local}}/profiles/:username/follow",
+							"host": [
+								"{{local}}"
+							],
+							"path": [
+								"profiles",
+								":username",
+								"follow"
+							],
+							"variable": [
+								{
+									"key": "username",
+									"value": "auronvila"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "feed",
+			"item": [
+				{
+					"name": "currentUserFeed",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "hello-world",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{local}}",
+					"host": [
+						"{{local}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
