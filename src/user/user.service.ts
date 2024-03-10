@@ -16,11 +16,23 @@ export class UserService {
   constructor(@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) {
   }
 
+
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const userByEmail = await this.userRepository.findOne({ where: { email: createUserDto.email } });
     const userByUsername = await this.userRepository.findOne({ where: { username: createUserDto.username } });
+    const errorResponse = {
+      errors: {},
+    };
+    if (userByEmail) {
+      errorResponse.errors['email'] = 'has already been taken';
+    }
+
+    if (userByUsername) {
+      errorResponse.errors['username'] = 'has already been taken';
+    }
+
     if (userByEmail || userByUsername) {
-      throw new HttpException('Email or username are taken', HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
@@ -53,13 +65,17 @@ export class UserService {
       select: ['email', 'bio', 'password', 'id', 'username', 'image'],
     });
 
+    const errorResponse = {
+      errors: { 'email or password': 'is invalid' },
+    };
+
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     const isPasswordValid = await compare(password, user.password);
     if (!isPasswordValid) {
-      throw new NotFoundException('Invalid credentials');
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     // deleting the password, so it does not return it back to the frontend
