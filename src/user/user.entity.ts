@@ -30,6 +30,9 @@ export class UserEntity {
   @Column({ select: false })
   password: string;
 
+  @Column({ nullable: true })
+  walletAddress: string;
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await hash(this.password, 10);
