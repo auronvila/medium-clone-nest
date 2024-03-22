@@ -5,10 +5,12 @@ import {
   JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { hash } from 'bcrypt';
 import { ArticleEntity } from '@app/article/article.entity';
+import { WalletEntity } from '@app/wallet/wallet.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -30,8 +32,11 @@ export class UserEntity {
   @Column({ select: false })
   password: string;
 
-  @Column({ nullable: true })
-  walletAddress: string;
+  @Column({nullable:true})
+  publicKey:string
+
+  @OneToOne(() => WalletEntity, wallet => wallet.user)
+  wallet: WalletEntity;
 
   @BeforeInsert()
   async hashPassword() {
