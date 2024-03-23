@@ -1,8 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { WalletEntity } from '@app/wallet/wallet.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '@app/user/user.entity';
 import { Repository } from 'typeorm';
+import Web3 from 'web3';
+import * as process from 'process';
+
+const infuraEndpoint = `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`;
+
+const web3 = new Web3(new Web3.providers.HttpProvider(infuraEndpoint));
 
 @Injectable()
 export class WalletService {
@@ -14,29 +20,40 @@ export class WalletService {
   ) {
   }
 
-  async getWalletByUserId(userId: string) {
-    return 'walletttt';
+  async getWalletByUserId(userId: string): Promise<{ publicKey: string }> {
+    const walletData = await this.walletRepository.findOne({ where: { user: { id: userId } } });
+    if (walletData) {
+      return { publicKey: walletData.publicKey };
+    } else {
+      return null;
+    }
   }
 
   async generateWalletForUser(userId: string): Promise<WalletEntity> {
-    // Generate wallet addresses
-    // const publicKey = generatePublicKey(); // Implement your logic to generate public key
-    // const privateKey = generatePrivateKey(); // Implement your logic to generate private key
+    const walletData = await this.getWalletByUserId(userId);
+    if (walletData && walletData.publicKey !== null) {
+      throw new HttpException('This account already has a wallet', HttpStatus.FORBIDDEN);
+    }
 
-    // Create a new Wallet entity
+    const newAccount = web3.eth.accounts.create();
+    const address = newAccount.address;
+    const privateKey = newAccount.privateKey;
+
     const wallet = new WalletEntity();
-    // wallet.publicKey = publicKey;
-    // wallet.privateKey = privateKey;
+    wallet.publicKey = address;
+    wallet.privateKey = privateKey;
 
-    // Find user by userId
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
-    // Assign wallet to user
     user.wallet = wallet;
+    user.publicKey = address;
 
-    // Save user and wallet
+    await this.walletRepository.save(wallet);
     await this.userRepository.save(user);
 
+    delete wallet.id;
     return wallet;
   }
+
 }
+

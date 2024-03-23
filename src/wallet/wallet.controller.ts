@@ -15,7 +15,7 @@ export class WalletController {
   }
 
   @Post()
-  @UseGuards()
+  @UseGuards(AuthGuard)
   async generateWallet(@User('id') userId: string) {
     return this.walletService.generateWalletForUser(userId);
   }
