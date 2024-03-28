@@ -3,21 +3,26 @@ import { WalletEntity } from '@app/wallet/wallet.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '@app/user/user.entity';
 import { Repository } from 'typeorm';
-import Web3 from 'web3';
-import * as process from 'process';
+import { ethers } from 'ethers';
+import { WalletReqDto } from '@app/wallet/dto/wallet-req.dto';
+import { WithdrawRes } from '@app/wallet/withdrawRes';
+import * as dotenv from 'dotenv';
 
-const infuraEndpoint = `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`;
-
-const web3 = new Web3(new Web3.providers.HttpProvider(infuraEndpoint));
+dotenv.config();
+const infuraEndpoint = `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`;
 
 @Injectable()
 export class WalletService {
+  private provider: ethers.JsonRpcProvider;
+  private wallet: ethers.Wallet;
+
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
     @InjectRepository(WalletEntity)
     private walletRepository: Repository<WalletEntity>,
   ) {
+    this.provider = new ethers.JsonRpcProvider(infuraEndpoint);
   }
 
   async getWalletByUserId(userId: string): Promise<{ publicKey: string }> {
@@ -25,7 +30,7 @@ export class WalletService {
     if (walletData) {
       return { publicKey: walletData.publicKey };
     } else {
-      return null;
+      throw new HttpException('This account do not have a wallet', HttpStatus.FORBIDDEN);
     }
   }
 
@@ -35,9 +40,9 @@ export class WalletService {
       throw new HttpException('This account already has a wallet', HttpStatus.FORBIDDEN);
     }
 
-    const newAccount = web3.eth.accounts.create();
-    const address = newAccount.address;
+    const newAccount = ethers.Wallet.createRandom();
     const privateKey = newAccount.privateKey;
+    const address = await newAccount.getAddress();
 
     const wallet = new WalletEntity();
     wallet.publicKey = address;
@@ -55,5 +60,22 @@ export class WalletService {
     return wallet;
   }
 
+  async withDraw(userId: string, withdrawReqData: WalletReqDto): Promise<WithdrawRes> {
+    const senderWallet = await this.walletRepository.findOne({ where: { user: { id: userId } } });
+    const sendersPrivateKey = senderWallet.privateKey;
+    const wallet = new ethers.Wallet(sendersPrivateKey, this.provider);
+    try {
+      const tx = await wallet.sendTransaction({
+        to: withdrawReqData.to,
+        value: ethers.parseEther(withdrawReqData.amount),
+      });
+      await tx.wait();
+      const resDto = {
+        txHash: tx.hash,
+      };
+      return resDto;
+    } catch (e) {
+      throw new HttpException(e, HttpStatus.FORBIDDEN);
+    }
+  }
 }
-
